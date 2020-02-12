@@ -34,19 +34,6 @@ Order of Deployment:
 * test jupyterhub - helm 
 
 ---
-Note regarding kubectl nginx-ingress controller deployment
----
-Note, that this is what created the load balancer in the infrastructure, and applied the instances to the load balancer. What needed to be ran was: 
-
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/mandatory.yaml
-
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/provider/aws/service-l4.yaml
-
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/provider/aws/patch-configmap-l4.yaml
-These three commmands will create the ELB, and then setup the required pods and ingress in the infrastructure. 
-> NOTE: Since there is a load balancer in front of the service, the nginx-ingress ingress pod needs to be configured to terminate SSL. Use of kube-lego is deprecated. 
-
----
 Deployment:
 ---
 **VPC - CloudFormation**
@@ -240,6 +227,7 @@ Deployment:
 
 14. Test application:
     You should now be able to go to the host.domain.tld that you setup in your DNS registrar. This will forward you to the ELB, then cluster and the solution. 
+
 ---
 Extended documentation: Using manual SSL termination on Nginx Ingress controller:
 ---
@@ -274,3 +262,18 @@ Once the chart has been updated, the deployment will need to be updated:
 > This should be a very quick update and no user pods will be restarted 
 
 Once this process is completed it may take up to a minute for the updated ssl certificate to show in the hub. 
+
+---
+Extended documentation: Regarding kubectl nginx-ingress controller deployment
+---
+Note, that this is what created the load balancer in the infrastructure, and applied the instances to the load balancer. What needed to be ran was: 
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/mandatory.yaml
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/provider/aws/service-l4.yaml
+
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/provider/aws/patch-configmap-l4.yaml
+These three commmands will create the ELB, and then setup the required pods and ingress in the infrastructure. 
+> NOTE: Since there is a load balancer in front of the service, the nginx-ingress ingress pod needs to be configured to terminate SSL. Use of kube-lego is deprecated. 
+
+
