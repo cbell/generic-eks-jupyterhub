@@ -1,0 +1,94 @@
+auth:
+  admin:
+    users:
+    - GitHubAdminAccount
+  github:
+    callbackUrl: https://host.domain.tld/hub/oauth_callback
+    clientId: XXXXXXX
+    clientSecret: XXXXXXX
+  type: github
+cull:
+  enabled: true
+  every: 600
+  timeout: 3600
+  users: false
+hub:
+  extraConfig: |
+    # Time out issue
+    c.Spawner.http_timeout = 300
+    # Sudo rights for JH admins and 'chowning' homes
+    def is_admin(spawner): return ['no', 'yes'][spawner.user.admin]
+    c.KubeSpawner.environment.update({
+      "GRANT_SUDO": is_admin,
+      "CHOWN_HOME": 'yes'
+    })
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 256Mi
+ingress:
+  annotations:
+    kubernetes.io/tls-acme: "true"
+  enabled: true
+  hosts:
+  - host.domain.tld
+  tls:
+  - hosts:
+    - host.domain.tld
+    secretName: kubelego-tls-jupyterhub
+prePuller:
+  continuous:
+    enabled: true
+proxy:
+  secretToken: proxy-secret-goes-here
+  service:
+    type: ClusterIP
+scheduling:
+  podPriority:
+    defaultPriority: 0
+    enabled: true
+    globalDefault: false
+    userPlaceholderPriority: -10
+  userPlaceholder:
+    enabled: false
+    replicas: 1
+  userPods:
+    nodeAffinity:
+      matchNodePurpose: prefer
+  userScheduler:
+    enabled: true
+singleuser:
+  cmd: start-singleuser.sh
+  cpu:
+    guarantee: 2
+    limit: 8
+  defaultUrl: /lab
+  fsGid: 1000
+  image:
+    name: jupyter/datascience-notebook
+    tag: 45f07a14b422 # using latest version as of 11-12-2019
+  lifecycleHooks:
+    postStart:
+      exec:
+        command:
+        - /bin/sh
+        - -c
+        - test -L /home/jovyan/shared || ln -s /shared /home/jovyan/shared
+  memory:
+    guarantee: 1G
+    limit: 2G
+  storage:
+    extraVolumeMounts:
+    - mountPath: /shared
+      name: pv-shared
+    extraVolumes:
+    - name: pv-shared
+      nfs:
+        path: /shared
+        server: amazon-efs-shared-storage-server
+    homeMountPath: /home/jovyan
+    static:
+      pvcName: nfs-shared
+      subPath: home/{username}
+    type: static
+  uid: 0

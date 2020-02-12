@@ -1,0 +1,52 @@
+apiVersion: v1 
+kind: PersistentVolume 
+metadata: 
+  name: nfs-host-pv 
+spec: 
+  capacity: 
+    storage: 1Gi 
+  accessModes: 
+    - ReadWriteMany 
+  nfs: 
+    server: amazon-efs-hub-storage-server
+    path: "/host-hub" 
+ 
+--- 
+kind: PersistentVolumeClaim 
+apiVersion: v1 
+metadata: 
+  name: nfs-host-pvc
+spec: 
+  accessModes: 
+    - ReadWriteMany 
+  storageClassName: "" 
+  resources: 
+    requests: 
+      storage: 1Gi
+
+---
+apiVersion: v1 
+kind: PersistentVolume 
+metadata: 
+  name: nfs-host
+spec: 
+  capacity: 
+    storage: 1Gi 
+  accessModes: 
+    - ReadWriteMany 
+  nfs: 
+    server: amazon-efs-shared-storage-server
+    path: "/" 
+
+--- 
+kind: PersistentVolumeClaim 
+apiVersion: v1 
+metadata: 
+  name: nfs-host
+spec: 
+  accessModes: 
+    - ReadWriteMany 
+  storageClassName: "" 
+  resources: 
+    requests: 
+      storage: 1Gi 

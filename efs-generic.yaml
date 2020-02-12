@@ -1,0 +1,95 @@
+Description: 'CloudFormation Template for research-k8s VPC. Based on default VPC template here: https://docs.aws.amazon.com/codebuild/latest/userguide/cloudformation-vpc-template.html'
+
+Parameters: 
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource name 
+    Type: String 
+  ShareName:
+    Description: Name for the share, will be appended to environment name 
+    Type: String 
+  VpcBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: The CIDR Range for the VPC. 
+  PublicSubnetA:
+    Type: String
+    Default: subnet-xx
+    Description: Subnet ID for Subnet A. 
+  PublicSubnetB:
+    Type: String
+    Default: subnet-xx
+    Description: Subnet ID for Subnet B. 
+  PublicSubnetC:
+    Type: String
+    Default: subnet-xx
+    Description: Subnet ID for Subnet C. 
+  ShareSecurityGroup:
+    Type: String 
+    Default: sg-xx
+    Description: Security group for EFS Share 
+  BillFundTag:
+    Description: Tag for back end reporting
+    Type: String 
+    Default: departmentx
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "General Information"
+        Parameters:
+          - EnvironmentName
+          - ShareName
+          - BillFundTag 
+      -
+        Label:
+          default: "Networking and Security"
+        Parameters:
+          - VpcBlock
+          - PublicSubnetA
+          - PublicSubnetB
+          - PublicSubnetC
+          - ShareSecurityGroup 
+          
+
+Resources:
+  EFSShare: # EFS Share for shared project data
+    Type: AWS::EFS::FileSystem
+    Properties:
+      Encrypted: true 
+      FileSystemTags:
+       - Key: Name
+         Value: !Sub ${EnvironmentName}-${ShareName}
+       - Key: BackupSchedule
+         Value: monthly
+       - Key: BillFund
+         Value: !Ref BillFundTag 
+
+  EFSShareMountA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSShare
+      SecurityGroups:
+        - !Ref ShareSecurityGroup
+      SubnetId: !Sub ${PublicSubnetA}
+  EFSShareMountB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSShare
+      SecurityGroups:
+        - !Ref ShareSecurityGroup
+      SubnetId: !Sub ${PublicSubnetB}
+  EFSShareMountC:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref EFSShare
+      SecurityGroups: 
+        - !Ref ShareSecurityGroup
+      SubnetId: !Sub ${PublicSubnetC}
+
+Outputs:
+
+  EFSShare:
+    Description: EFSShare-ID
+    Value: !Ref EFSShare
