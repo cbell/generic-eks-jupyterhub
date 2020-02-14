@@ -1,0 +1,41 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: cluster-name
+  region: us-west-2
+  
+vpc:
+  id: "vpc-xxx"
+  cidr: "10.10.0.0/16"
+  subnets:
+    public:
+      us-west-2a:
+        id: "subnet-xxx"
+        cidr: "10.10.1.0/24" 
+      us-west-2b:
+        id: "subnet-xxx"
+        cidr: "10.10.2.0/24" 
+      us-west-2c:
+        id: "subnet-xxx"
+        cidr: "10.10.3.0/24"
+
+nodeGroups:
+  - name: node-group-name
+    labels: { role: general-use }
+    minSize: 1 
+    maxSize: 4
+    desiredCapacity: 2
+    instancesDistribution:
+      maxPrice: 0.30
+      instanceTypes: ["r4.2xlarge", "c5.2xlarge"] # current spot pricing: r4.2xlarge $0.139, c5.2xlarge $0.1309
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0 # This is going to make it so all resources are spot pricing based, 0 are on-demand. 
+      spotInstancePools: 2
+    availabilityZones: ["xx-xxxx-2a", "xx-xxxx-2b", "xx-xxxx-2c"]
+    ssh:
+      publicKeyName: ssh-key-name
+    tags:
+      Name: node-group-name
+        
+        

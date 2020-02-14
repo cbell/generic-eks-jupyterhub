@@ -48,12 +48,23 @@ Deployment:
 
 **ec2 compute - eksctl**
 1. Verify the AWS CLI is installed and setup 
-2. Run the following command, substiting the eks.yaml file (changes to eks.yaml may be required, this is a smaller installation)
+2. Update eks.yaml or eks-spot-nodes.yaml. 
+    >Pricing strategy should be decided before creating a cluster in AWS. If you are looking to do a long term, commital agreement with AWS the standard eks.yaml may be the correct solution. This will by default be on-demand pricing, and that you will need to create reservations after the creation of the cluster. To use spot pricing, the eks-spot-nodes.yaml configuration file should be used. 
+    
+    Once this has been decided, the configuration file should be updated with the following unique to your environment fields:
+      - vpc-id
+      - subneta-id
+      - subnetb-id
+      - subnetc-id
+      - avilabilityzones 
+      - ssh public key 
+        > Note: The cidr for each subnet may need to be adjusted if you customized these in the VPC deployment during the CloudFormation deployment 
+3. Run the following command, substiting the eks.yaml file (changes to eks.yaml may be required, this is a smaller installation)
 
         eksctl create cluster -f /path/to/files/eks.yaml
-    >Note: You may want to update the eks.yaml file to have a different size instance, or different number of instances. Currently it is going to create a single instance of an r5.xlarge.
+    >Note: You may want to update the eks.yaml file to have a different size instance, or different number of instances. Default of eks.yaml is a single r5.xlarge.
 
-3.  Run the following command to verify installation has completed (after the progres is finished)
+4.  Run the following command to verify installation has completed (after the progres is finished)
 
         eksctl get cluster
 
