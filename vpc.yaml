@@ -84,6 +84,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select [ 0, !GetAZs '' ]
       CidrBlock: !Ref 'VPCSubnetA'
+      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
        - Key: Name
@@ -98,6 +99,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select [ 1, !GetAZs '' ]
       CidrBlock: !Ref 'VPCSubnetB'
+      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
        - Key: Name
@@ -112,6 +114,7 @@ Resources:
     Properties:
       AvailabilityZone: !Select [ 2, !GetAZs '' ]
       CidrBlock: !Ref 'VPCSubnetC'
+      MapPublicIpOnLaunch: true
       VpcId: !Ref VPC
       Tags:
        - Key: Name
